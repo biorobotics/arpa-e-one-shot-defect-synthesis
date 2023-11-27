@@ -7,6 +7,10 @@ import torch
 # --- read options --- #
 opt = config.read_arguments(train=True)
 
+# NEW ADDITION
+torch.set_num_threads(8)
+print(opt)
+
 # --- create dataloader and recommended model config --- #
 dataloader, model_config = dataloading.prepare_dataloading(opt)
 
