@@ -5,6 +5,7 @@ from PIL import Image
 from torchvision import transforms as TR
 import torchvision.transforms.functional as F
 from .recommended_config import get_recommended_config
+import pdb
 
 
 def prepare_dataloading(opt):
@@ -30,6 +31,7 @@ class Dataset(torch.utils.data.Dataset):
         """
         The dataset class. Supports both regimes *with* and *without* segmentation masks.
         """
+
         self.device = opt.device
         # --- images --- #
         self.root_images = os.path.join(opt.dataroot, opt.dataset_name, "image")
@@ -39,7 +41,7 @@ class Dataset(torch.utils.data.Dataset):
         self.image_resolution, self.recommended_config = get_recommended_config(self.get_im_resolution(opt.max_size))
 
         # --- masks --- #
-        if os.path.isdir(self.root_masks) and not opt.no_masks:
+        if os.path.isdir("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+self.root_masks) and not opt.no_masks:
             self.list_masks = self.get_frames_list(self.root_masks)
             assert len(self.list_imgs) == len(self.list_masks), \
                 "Different number of images and masks %d vs %d" % (len(self.list_imgs), len(self.list_masks))
@@ -55,7 +57,7 @@ class Dataset(torch.utils.data.Dataset):
         print("Created a dataset of size =", len(self.list_imgs), "with image resolution", self.image_resolution)
 
     def get_frames_list(self, path):
-        return sorted(os.listdir(path))
+        return sorted(os.listdir("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+path))
 
     def __len__(self):
         return 100000000  # so first epoch finishes only with break
@@ -67,7 +69,7 @@ class Dataset(torch.utils.data.Dataset):
         """
         res_list = list()
         for cur_img in self.list_imgs:
-            img_pil = Image.open(os.path.join(self.root_images, cur_img)).convert("RGB")
+            img_pil = Image.open(os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",self.root_images, cur_img)).convert("RGB")
             res_list.append(img_pil.size)
         all_res_equal = len(set(res_list)) <= 1
         if all_res_equal:
@@ -94,7 +96,7 @@ class Dataset(torch.utils.data.Dataset):
         """
         max_index = 0
         for cur_mask in self.list_masks:
-            im = TR.functional.to_tensor(Image.open(os.path.join(self.root_masks, cur_mask)))
+            im = TR.functional.to_tensor(Image.open(os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",self.root_masks, cur_mask)))
             if (im.unique() * 256).max() > 30:
                 # --- black-white map of one object and background --- #
                 max_index = 2 if max_index < 2 else max_index
@@ -125,14 +127,14 @@ class Dataset(torch.utils.data.Dataset):
         target_size = self.image_resolution
 
         # --- image ---#
-        img_pil = Image.open(os.path.join(self.root_images, self.list_imgs[idx])).convert("RGB")
+        img_pil = Image.open(os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",self.root_images, self.list_imgs[idx])).convert("RGB")
         img = F.to_tensor(F.resize(img_pil, size=target_size))
         img = (img - 0.5) * 2
         output["images"] = img
 
         # --- mask ---#
         if not self.no_masks:
-            mask_pil = Image.open(os.path.join(self.root_masks, self.list_imgs[idx][:-4] + ".png"))
+            mask_pil = Image.open(os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",self.root_masks, self.list_imgs[idx][:-4] + ".png"))
             mask = F.to_tensor(F.resize(mask_pil, size=target_size, interpolation=Image.NEAREST))
             mask = self.create_mask_channels(mask)  # mask should be N+1 channels
             output["masks"] = mask

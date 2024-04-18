@@ -7,6 +7,7 @@ import torch.nn.utils.spectral_norm as sp_norm
 import copy
 from .utils import to_rgb, from_rgb, to_decision, get_norm_by_name
 from .feature_augmentation import Content_FA, Layout_FA
+import pdb
 
 
 def create_models(opt, recommended_config):
@@ -28,7 +29,7 @@ def create_models(opt, recommended_config):
         netD = None
 
     # --- load previous ckpt  --- #
-    path = os.path.join(opt.checkpoints_dir, opt.exp_name, "models")
+    path = os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",opt.checkpoints_dir, opt.exp_name, "models")
     if opt.continue_train or opt.phase == "test":
         netG.load_state_dict(torch.load(os.path.join(path, str(opt.continue_epoch)+"_G.pth")))
         print("Loaded Generator checkpoint")

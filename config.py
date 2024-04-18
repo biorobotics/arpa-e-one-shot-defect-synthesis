@@ -1,14 +1,21 @@
 import argparse
 import pickle
 import os
+import pdb
 
 
-def read_arguments(train=True):
+def read_arguments(train=True, preset_args=None):
     parser = get_arguments()
-    opt = parser.parse_args()
+    if preset_args!=None:
+        opt = parser.parse_args(preset_args)
+    else:
+        opt = parser.parse_args()
     if opt.continue_train or not train:
         update_options_from_file(opt, parser)
-    opt = parser.parse_args()
+    if preset_args!=None:
+        opt = parser.parse_args(preset_args)
+    else:
+        opt = parser.parse_args()
     opt.device = "cpu" if opt.cpu else "cuda:0"
     opt.phase = 'train' if train else 'test'
     if train:
@@ -33,7 +40,7 @@ def get_arguments():
     parser.add_argument('--max_size', type=int, help='limit image size in max dimension', default=1024)
     parser.add_argument('--continue_train', action="store_true", help='continue training of a previous checkpoint?')
     parser.add_argument('--which_epoch', type=int, help='which epoch to use for evaluation')
-    parser.add_argument('--num_generated', type=int, default=100, help='which epoch to use for evaluation')
+    parser.add_argument('--num_generated', type=int, default=100, help='number of evaluation images generated')
 
     # regime
     parser.add_argument('--no_masks', action='store_true', help='use the regime without segmentation masks')
@@ -74,7 +81,7 @@ def get_arguments():
 
 def update_options_from_file(opt, parser):
     file_name = os.path.join(opt.checkpoints_dir, opt.exp_name, "opt.pkl")
-    new_opt = pickle.load(open(file_name, 'rb'))
+    new_opt = pickle.load(open('/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/'+file_name, 'rb'))
     for k, v in sorted(vars(opt).items()):
         if hasattr(new_opt, k) and v != getattr(new_opt, k):
             new_val = getattr(new_opt, k)

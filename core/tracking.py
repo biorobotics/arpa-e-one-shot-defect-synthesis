@@ -11,13 +11,13 @@ class visualizer():
     Implements helper functions to save losses, logits, networks and intermediate visuals
     """
     def __init__(self, opt):
-        folder_losses = os.path.join(opt.checkpoints_dir, opt.exp_name, "losses")
+        folder_losses = os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+opt.checkpoints_dir, opt.exp_name, "losses")
 
-        folder_networks = os.path.join(opt.checkpoints_dir, opt.exp_name, "models")
+        folder_networks = os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+opt.checkpoints_dir, opt.exp_name, "models")
         if opt.phase == "train":
-            folder_images = os.path.join(opt.checkpoints_dir, opt.exp_name, "images")
+            folder_images = os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+opt.checkpoints_dir, opt.exp_name, "images")
         else:
-            folder_images = os.path.join(opt.checkpoints_dir, opt.exp_name, "evaluation")
+            folder_images = os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+opt.checkpoints_dir, opt.exp_name, "evaluation")
         self.losses_saver = losses_saver(folder_losses, opt.continue_epoch)
         self.image_saver = image_saver(folder_images, opt.no_masks, opt.phase, opt.continue_epoch)
         self.network_saver = network_saver(folder_networks, opt.no_EMA)
@@ -28,8 +28,8 @@ class visualizer():
     def save_losses_logits(self, epoch):
         self.losses_saver.save(epoch)
 
-    def save_batch(self, fake, epoch, i=None):
-        self.image_saver.save(fake, epoch, i)
+    def save_batch(self, fake, epoch, i=None, return_image=False):
+        return self.image_saver.save(fake, epoch, i, return_image)
 
     def save_networks(self, netG, netD, netEMA ,epoch):
         self.network_saver.save(netG, netD, netEMA, epoch)
@@ -109,17 +109,24 @@ class image_saver():
         self.ext = ".png" if self.phase == "test" else ".jpg"
         if phase == "test":
             os.makedirs(os.path.join(folder_images, str(continue_epoch)), exist_ok=True)
+            # TODO make it so that I can make a train and test evaluation folder for cyclegan
         else:
             os.makedirs(folder_images, exist_ok=True)
 
-    def save(self, fake, epoch, i=None):
+    def save(self, fake, epoch, i=None, return_image=False):
         epoch = str(epoch) + "/" + str(i) if i is not None else str(epoch)
 
         images = (fake["images"][-1] + 1) / 2
-        torchvision.utils.save_image(images, os.path.join(self.folder_images, epoch+self.ext))
+
         if not self.no_masks:
             painted_masks = self.paint_mask(fake["masks"])
-            torchvision.utils.save_image(painted_masks, os.path.join(self.folder_images, epoch+"_mask"+self.ext))
+        
+        if not return_image:
+            torchvision.utils.save_image(images, os.path.join(self.folder_images, epoch+self.ext))
+            if not self.no_masks:
+                torchvision.utils.save_image(painted_masks, os.path.join(self.folder_images, epoch+"_mask"+self.ext))
+        else:
+            return (images, painted_masks)
 
     def paint_mask(self, masks):
         ans = torch.zeros((masks.shape[0], 3, masks.shape[2], masks.shape[3]))
