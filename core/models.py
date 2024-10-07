@@ -29,7 +29,7 @@ def create_models(opt, recommended_config):
         netD = None
 
     # --- load previous ckpt  --- #
-    path = os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",opt.checkpoints_dir, opt.exp_name, "models")
+    path = os.path.join("/home/pipe/Documents/main_project/arpa-e-one-shot-defect-synthesis/",opt.checkpoints_dir, opt.exp_name, "models")
     if opt.continue_train or opt.phase == "test":
         netG.load_state_dict(torch.load(os.path.join(path, str(opt.continue_epoch)+"_G.pth")))
         print("Loaded Generator checkpoint")

@@ -81,7 +81,7 @@ def get_arguments():
 
 def update_options_from_file(opt, parser):
     file_name = os.path.join(opt.checkpoints_dir, opt.exp_name, "opt.pkl")
-    new_opt = pickle.load(open('/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/'+file_name, 'rb'))
+    new_opt = pickle.load(open('/home/pipe/Documents/main_project/arpa-e-one-shot-defect-synthesis/'+file_name, 'rb'))
     for k, v in sorted(vars(opt).items()):
         if hasattr(new_opt, k) and v != getattr(new_opt, k):
             new_val = getattr(new_opt, k)

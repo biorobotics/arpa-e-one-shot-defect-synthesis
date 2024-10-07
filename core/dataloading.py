@@ -57,7 +57,7 @@ class Dataset(torch.utils.data.Dataset):
         print("Created a dataset of size =", len(self.list_imgs), "with image resolution", self.image_resolution)
 
     def get_frames_list(self, path):
-        return sorted(os.listdir("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/"+path))
+        return sorted(os.listdir("/home/pipe/Documents/main_project/arpa-e-one-shot-defect-synthesis/"+path))
 
     def __len__(self):
         return 100000000  # so first epoch finishes only with break
@@ -69,7 +69,7 @@ class Dataset(torch.utils.data.Dataset):
         """
         res_list = list()
         for cur_img in self.list_imgs:
-            img_pil = Image.open(os.path.join("/home/pipe/Documents/arpa-e-one-shot-defect-synthesis/",self.root_images, cur_img)).convert("RGB")
+            img_pil = Image.open(os.path.join("/home/pipe/Documents/main_project/arpa-e-one-shot-defect-synthesis/",self.root_images, cur_img)).convert("RGB")
             res_list.append(img_pil.size)
         all_res_equal = len(set(res_list)) <= 1
         if all_res_equal:
